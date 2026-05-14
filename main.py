@@ -18,10 +18,13 @@ logger = logging.getLogger(__name__)
 
 
 def get_base_dir():
-    """获取程序运行目录（exe所在目录，用于settings.json等用户文件）"""
-    if getattr(sys, 'frozen', False):
-        return os.path.dirname(sys.executable)
-    return os.path.dirname(os.path.abspath(__file__))
+    """获取程序运行目录（exe所在目录，用于settings.json等用户文件）
+    
+    Nuitka onefile: sys.argv[0] 是 exe 的实际路径
+    Nuitka standalone: sys.argv[0] 也是 exe 路径
+    开发模式: sys.argv[0] 是 main.py 路径
+    """
+    return os.path.dirname(os.path.abspath(sys.argv[0]))
 
 
 def get_resource_dir():
