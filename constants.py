@@ -1,0 +1,29 @@
+"""应用常量定义"""
+
+APP_NAME = "DG-LAB Sensora"
+APP_VERSION = "v2.0.1"
+
+# 网络端口
+DEFAULT_WS_PORT = 9999
+DEFAULT_HTTP_PORT = 8800
+DEFAULT_OSC_RECV_PORT = 9001
+DEFAULT_CHATBOX_PORT = 9000
+
+# 强度限制
+MAX_INTENSITY = 200
+
+# 安全限制
+SAFETY_WINDOW_SECONDS = 10.0
+SAFETY_MAX_PER_WINDOW = 30
+SAFETY_MAX_TOTAL = 30
+
+# 波形参数
+WAVEFORM_MAX_ENTRIES = 86  # 每次发送最大条目数
+WAVEFORM_ENTRY_DURATION_MS = 100  # 每条波形持续时间(ms)
+WAVEFORM_FEED_INTERVAL = 0.5  # 波形喂食间隔(秒)
+
+# 心跳
+HEARTBEAT_INTERVAL = 60  # 秒
+
+# DG-LAB 二维码URL模板
+QRCODE_URL_TEMPLATE = "https://www.dungeon-lab.com/app-download.php#DGLAB-SOCKET#ws://{host}:{port}/{client_id}"

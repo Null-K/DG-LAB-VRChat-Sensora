@@ -1,0 +1,53 @@
+name: Build Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+env:
+  packageName: "DG-LAB-Sensora"
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Get version from tag
+        id: version
+        shell: bash
+        run: |
+          TAG=${GITHUB_REF#refs/tags/v}
+          echo "version=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install nuitka ordered-set zstandard
+
+      - name: Build with Nuitka
+        run: |
+          python -m nuitka --onefile --standalone --windows-console-mode=disable --windows-icon-from-ico=icon.ico --disable-plugin=pywebview --include-data-dir=web=web --include-package=pythonosc --include-package=pydglab_ws --include-package=aiohttp --include-package=yarl --include-package=multidict --include-package=aiosignal --include-package=frozenlist --include-package=qrcode --include-package=webview --include-package=clr_loader --include-package=pythonnet --nofollow-import-to=tkinter --nofollow-import-to=webview.platforms.android --nofollow-import-to=webview.platforms.gtk --nofollow-import-to=webview.platforms.cocoa --output-filename=${{ env.packageName }}.exe --output-dir=dist --assume-yes-for-downloads --remove-output --company-name=PuddingKC --product-name="DG-LAB Sensora" --product-version=${{ steps.version.outputs.version }} --file-description="DG-LAB VRChat Integration Tool" main.py
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "Release ${{ steps.version.outputs.version }}"
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            dist/${{ env.packageName }}.exe

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DG-LAB Sensora</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <!-- 侧边导航 -->
+        <nav class="sidebar">
+            <div class="nav-brand">
+                <img class="brand-icon" src="images/logo.svg" alt="logo">
+                <span class="brand-text">Sensora +</span>
+            </div>
+            <ul class="nav-list">
+                <li class="nav-item active" data-page="connection">
+                    <span class="nav-icon icon-link"></span>
+                    <span>连接</span>
+                </li>
+                <li class="nav-item" data-page="control">
+                    <span class="nav-icon icon-sliders"></span>
+                    <span>控制</span>
+                </li>
+                <li class="nav-item" data-page="waveform">
+                    <span class="nav-icon icon-wave"></span>
+                    <span>波形</span>
+                </li>
+                <li class="nav-item" data-page="osc">
+                    <span class="nav-icon icon-radio"></span>
+                    <span>OSC</span>
+                </li>
+                <li class="nav-item" data-page="settings">
+                    <span class="nav-icon icon-gear"></span>
+                    <span>设置</span>
+                </li>
+                <li class="nav-item" data-page="log">
+                    <span class="nav-icon icon-log"></span>
+                    <span>日志</span>
+                </li>
+            </ul>
+            <div class="nav-status">
+                <div class="status-dot disconnected" id="statusDot"></div>
+                <span id="statusText">未连接</span>
+            </div>
+        </nav>
+
+        <!-- 主内容区 -->
+        <main class="content">
+            <!-- 连接页 -->
+            <section class="page active" id="page-connection">
+                <h2>设备连接</h2>
+                <div class="card qr-card">
+                    <p class="card-desc">使用 DG-LAB APP 扫描二维码连接设备</p>
+                    <div class="qr-container" id="qrContainer">
+                        <div class="qr-placeholder">加载中...</div>
+                    </div>
+                    <div class="connection-info">
+                        <span class="info-label">设备:</span>
+                        <span id="connStatus" class="info-value">等待连接</span>
+                    </div>
+                    <button class="btn btn-secondary" id="btnRefreshQR">刷新二维码</button>
+                </div>
+                <div class="card">
+                    <h3>服务状态</h3>
+                    <div class="service-status">
+                        <div class="service-item">
+                            <span class="service-dot connected"></span>
+                            <span>WebSocket</span>
+                            <span class="service-info">端口 <span id="svcWsPort">9999</span></span>
+                        </div>
+                        <div class="service-item">
+                            <span class="service-dot" id="svcHttpDot"></span>
+                            <span>HTTP API</span>
+                            <span class="service-info">端口 <span id="svcHttpPort">8800</span></span>
+                        </div>
+                        <div class="service-item">
+                            <span class="service-dot" id="svcOscDot"></span>
+                            <span>OSC 接收</span>
+                            <span class="service-info" id="svcOscInfo">-</span>
+                        </div>
+                        <div class="service-item">
+                            <span class="service-dot" id="svcChatboxDot"></span>
+                            <span>ChatBox</span>
+                            <span class="service-info" id="svcChatboxInfo">-</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 控制页 -->
+            <section class="page" id="page-control">
+                <h2>强度控制</h2>
+                <div class="card-row">
+                    <div class="card channel-card">
+                        <h3>A 通道</h3>
+                        <div class="strength-display">
+                            <span class="strength-value" id="strengthA">0</span>
+                            <span class="strength-max">/ <span id="strengthAMax">200</span></span>
+                        </div>
+                        <input type="range" class="slider" id="sliderA" min="0" max="200" value="0">
+                        <div class="slider-labels">
+                            <span>0</span>
+                            <span>限制: <span id="limitA">0</span></span>
+                            <span id="sliderAMax">200</span>
+                        </div>
+                        <div class="preset-btns" data-channel="A">
+                            <button class="btn-preset" data-pct="0">0</button>
+                            <button class="btn-preset" data-pct="25">25%</button>
+                            <button class="btn-preset" data-pct="50">50%</button>
+                            <button class="btn-preset" data-pct="75">75%</button>
+                            <button class="btn-preset" data-pct="100">MAX</button>
+                        </div>
+                    </div>
+                    <div class="card channel-card">
+                        <h3>B 通道</h3>
+                        <div class="strength-display">
+                            <span class="strength-value" id="strengthB">0</span>
+                            <span class="strength-max">/ <span id="strengthBMax">200</span></span>
+                        </div>
+                        <input type="range" class="slider" id="sliderB" min="0" max="200" value="0">
+                        <div class="slider-labels">
+                            <span>0</span>
+                            <span>限制: <span id="limitB">0</span></span>
+                            <span id="sliderBMax">200</span>
+                        </div>
+                        <div class="preset-btns" data-channel="B">
+                            <button class="btn-preset" data-pct="0">0</button>
+                            <button class="btn-preset" data-pct="25">25%</button>
+                            <button class="btn-preset" data-pct="50">50%</button>
+                            <button class="btn-preset" data-pct="75">75%</button>
+                            <button class="btn-preset" data-pct="100">MAX</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>手动触发</h3>
+                    <div class="fire-controls">
+                        <select id="fireChannel">
+                            <option value="A">A通道</option>
+                            <option value="B">B通道</option>
+                            <option value="all">全部</option>
+                        </select>
+                        <select id="fireSeconds">
+                            <option value="1">1秒</option>
+                            <option value="2">2秒</option>
+                            <option value="3">3秒</option>
+                            <option value="5" selected>5秒</option>
+                            <option value="7">7秒</option>
+                            <option value="10">10秒</option>
+                        </select>
+                        <button class="btn btn-primary" id="btnFire">触发</button>
+                        <button class="btn btn-danger" id="btnStop">停止</button>
+                    </div>
+                    <div class="remaining-info">
+                        <span>A剩余: <span id="remainA">0</span>s</span>
+                        <span>B剩余: <span id="remainB">0</span>s</span>
+                        <span>波形: <span id="waveName">-</span></span>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>强度速率限制</h3>
+                    <p class="card-desc">限制强度变化速度，防止瞬间跳变</p>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>最大变化速率 (每秒)</label>
+                            <input type="number" id="strengthRateLimit" value="50" min="1" max="200">
+                        </div>
+                        <div class="form-group">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="rateLimitEnabled">
+                                <span>启用速率限制</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 波形页 -->
+            <section class="page" id="page-waveform">
+                <h2>波形库</h2>
+                <div class="card">
+                    <h3>波形模式</h3>
+                    <div class="form-group">
+                        <label>模式选择</label>
+                        <select id="waveformMode">
+                            <option value="library">随机波形库</option>
+                            <option value="custom">指定波形</option>
+                            <option value="instant">恒定强度</option>
+                            <option value="gradual">渐强</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="customWaveGroup" style="display:none">
+                        <label>选择波形</label>
+                        <select id="customWaveform"></select>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>预设波形列表</h3>
+                    <div class="waveform-grid" id="waveformGrid"></div>
+                </div>
+                <div class="card">
+                    <h3>波形监视</h3>
+                    <div class="wave-monitor">
+                        <div class="wave-channel">
+                            <span class="wave-label">A</span>
+                            <canvas id="waveCanvasA" width="500" height="60"></canvas>
+                        </div>
+                        <div class="wave-channel">
+                            <span class="wave-label">B</span>
+                            <canvas id="waveCanvasB" width="500" height="60"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- OSC页 -->
+            <section class="page" id="page-osc">
+                <h2>OSC 设置</h2>
+                <div class="card">
+                    <h3>ChatBox 输出</h3>
+                    <div class="form-group">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="chatboxEnabled" checked>
+                            <span>启用 ChatBox</span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>发送间隔 (秒)</label>
+                        <input type="number" id="chatboxInterval" value="3" min="1" max="60">
+                    </div>
+                    <div class="form-group">
+                        <label>自定义文本</label>
+                        <textarea id="customChatbox" rows="3" maxlength="144" placeholder="显示在Chatbox中的自定义文本，支持多行"></textarea>
+                        <span class="char-count"><span id="chatboxCharCount">0</span>/144</span>
+                    </div>
+                    <div class="form-group">
+                        <label>模板变量: {a} A通道强度, {b} B通道强度, {a_max} A上限, {b_max} B上限, {wave} 当前波形</label>
+                    </div>
+                    <div class="chatbox-preview">
+                        <label>预览</label>
+                        <div class="preview-box" id="chatboxPreview">-</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Avatar 通道配置</h3>
+                    <p class="card-desc">
+                        距离: 参数值按范围映射为强度，实时跟随 |
+                        电击: 参数值超过阈值时触发一次，有冷却 |
+                        触摸: 根据参数变化速度映射强度，摸越快越强
+                    </p>
+                    <div class="channel-params-section">
+                        <div class="channel-params-header">
+                            <span>A 通道参数</span>
+                            <button class="btn-add" id="btnAddParamA">+ 添加</button>
+                        </div>
+                        <div class="param-list" id="paramListA"></div>
+                    </div>
+                    <div class="channel-params-section">
+                        <div class="channel-params-header">
+                            <span>B 通道参数</span>
+                            <button class="btn-add" id="btnAddParamB">+ 添加</button>
+                        </div>
+                        <div class="param-list" id="paramListB"></div>
+                    </div>
+                    <div class="osc-monitor">
+                        <h4>参数监视</h4>
+                        <div class="osc-monitor-row">
+                            <div class="osc-monitor-item">
+                                <span class="osc-monitor-label">A 通道</span>
+                                <span class="osc-monitor-value" id="oscValueA">-</span>
+                                <div class="osc-monitor-bar"><div class="osc-monitor-fill" id="oscBarA"></div></div>
+                            </div>
+                            <div class="osc-monitor-item">
+                                <span class="osc-monitor-label">B 通道</span>
+                                <span class="osc-monitor-value" id="oscValueB">-</span>
+                                <div class="osc-monitor-bar"><div class="osc-monitor-fill" id="oscBarB"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 设置页 -->
+            <section class="page" id="page-settings">
+                <h2>系统设置</h2>
+                <div class="card">
+                    <h3>端口配置</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>WebSocket 端口</label>
+                            <input type="number" id="wsPort" value="9999" min="1" max="65535">
+                        </div>
+                        <div class="form-group">
+                            <label>HTTP 端口</label>
+                            <input type="number" id="httpPort" value="8800" min="1" max="65535">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>OSC 接收端口</label>
+                            <input type="number" id="oscRecvPort" value="9001" min="1" max="65535">
+                        </div>
+                        <div class="form-group">
+                            <label>ChatBox 端口</label>
+                            <input type="number" id="chatboxPort" value="9000" min="1" max="65535">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="btnSaveSettings">保存设置</button>
+                    <p class="hint">修改端口后需要重启软件生效</p>
+                </div>
+                <div class="card">
+                    <h3>关于</h3>
+                    <p>DG-LAB Sensora <span id="appVersion">v2.0.1</span></p>
+                    <p class="hint">用于连接 DG-LAB 设备的 VRChat 联动工具<br>兼容 “芝士郊狼台球后援会” 地图</p>
+                    <p class="hint">Author: <a href="https://github.com/Null-K" target="_blank" class="author-link">PuddingKC</a></p>
+                </div>
+            </section>
+
+            <!-- 日志页 -->
+            <section class="page" id="page-log">
+                <h2>运行日志</h2>
+                <div class="card log-card">
+                    <div class="log-toolbar">
+                        <select id="logFilter">
+                            <option value="all">全部</option>
+                            <option value="info">信息</option>
+                            <option value="warning">警告</option>
+                            <option value="error">错误</option>
+                        </select>
+                        <button class="btn btn-secondary" id="btnCopyLog">复制</button>
+                        <button class="btn btn-secondary" id="btnClearLog">清空</button>
+                    </div>
+                    <div class="log-list" id="logList">
+                        <div class="log-empty">暂无日志</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
