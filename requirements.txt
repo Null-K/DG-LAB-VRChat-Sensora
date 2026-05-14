@@ -4,3 +4,5 @@ aiohttp>=3.9
 python-osc>=1.8
 qrcode[pil]>=7.4
 Pillow>=10.0
+pydglab-ws>=1.0
+pythonnet>=3.0
