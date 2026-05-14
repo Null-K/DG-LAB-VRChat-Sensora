@@ -1,7 +1,7 @@
 """应用常量定义"""
 
 APP_NAME = "DG-LAB Sensora"
-APP_VERSION = "v2.0.1"
+APP_VERSION = "v2.0.2"
 
 # 网络端口
 DEFAULT_WS_PORT = 9999
