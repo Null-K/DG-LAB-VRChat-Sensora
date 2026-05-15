@@ -3,7 +3,7 @@
 DG-LAB 设备的 VRChat 联动工具，支持通过 OSC Avatar 参数和 HTTP API 控制 DG-LAB 郊狼设备。  
 兼容 “芝士郊狼台球后援会” 相关地图。
 
-<img src="screenshot/image_1.png" width="49%"><img src="screenshot/image_2.png" width="49%">
+<img src="screenshot/image_1.png" width="48%"> <img src="screenshot/image_2.png" width="48%">
 
 ## 功能
 
